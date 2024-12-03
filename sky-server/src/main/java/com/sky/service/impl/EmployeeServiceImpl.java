@@ -112,4 +112,17 @@ public class EmployeeServiceImpl implements EmployeeService {
         return new PageResult(total, records);
     }
 
+    @Override
+    public int startOrStop(Integer status, Long id) {
+        // 调用mapper接口的update方法，增强接口的适用性
+        // 所以传一个pojo类Employee给mapper接口
+        Employee employee = Employee.builder()
+                .id(id)
+                .status(status)
+                .build();
+
+        // 调用mapper接口的update方法
+        return employeeMapper.update(employee);
+    }
+
 }
