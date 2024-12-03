@@ -50,7 +50,7 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
 
             // 将empId放到LocalThread中，传递给service
             BaseContext.setCurrentId(empId);
-            log.info("当前员工id：", empId);
+//            log.info("当前员工id：", empId);
             //3、通过，放行
             return true;
         } catch (Exception ex) {
