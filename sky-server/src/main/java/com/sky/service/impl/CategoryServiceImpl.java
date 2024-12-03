@@ -66,4 +66,19 @@ public class CategoryServiceImpl implements CategoryService {
 
         return categoryMapper.update(category);
     }
+
+    /**
+     * 启用/禁用分类
+     * @param id
+     * @return
+     */
+    @Override
+    public int startOrStop(Integer status, Long id) {
+        Category category = Category.builder()
+                .id(id)
+                .status(status)
+                .build();
+
+        return categoryMapper.update(category);
+    }
 }
