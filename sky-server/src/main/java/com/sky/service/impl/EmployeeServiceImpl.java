@@ -18,6 +18,7 @@ import com.sky.result.PageResult;
 import com.sky.service.EmployeeService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -112,6 +113,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         return new PageResult(total, records);
     }
 
+    /**
+     * 修改员工账户状态信息
+     * @param status
+     * @param id
+     * @return
+     */
     @Override
     public int startOrStop(Integer status, Long id) {
         // 调用mapper接口的update方法，增强接口的适用性
@@ -122,6 +129,37 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .build();
 
         // 调用mapper接口的update方法
+        return employeeMapper.update(employee);
+    }
+
+    /**
+     * 根据员工id查询员工状态信息
+     * @param id
+     * @return
+     */
+    @Override
+    public Employee selectById(Long id) {
+        Employee employee = employeeMapper.selectById(id);
+
+        // 修改员工密码为****，防止隐私泄露
+        employee.setPassword("********");
+        return employee;
+    }
+
+    /**
+     * 编辑员工信息
+     * @param employeeDTO
+     * @return
+     */
+    @Override
+    public int updateEmployee(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);
+
+        // 设置员工的修改时间和修改者id
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+
         return employeeMapper.update(employee);
     }
 

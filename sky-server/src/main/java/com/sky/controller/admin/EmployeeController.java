@@ -131,4 +131,34 @@ public class EmployeeController {
             return Result.error(MessageConstant.UPDATE_STATUS_FAILURE);
         }
     }
+
+    /**
+     * 根据员工id查询员工信息
+     * @return
+     */
+    @GetMapping("/{id}")
+    @ApiOperation("根据员工id查询员工信息")
+    public Result<Employee> selectById(@PathVariable Long id) {
+        log.info("查询id = {}的员工信息", id);
+        Employee employee = employeeService.selectById(id);
+        return Result.success(employee);
+    }
+
+    /**
+     * 编辑员工信息
+     * @param employeeDTO
+     * @return
+     */
+    @PutMapping
+    @ApiOperation("编辑员工信息")
+    public Result updateEmployee(@RequestBody EmployeeDTO employeeDTO) {
+        log.info("编辑员工信息：{}", employeeDTO);
+        int ok = employeeService.updateEmployee(employeeDTO);
+
+        if (ok == 1) {
+            return Result.success();
+        } else {
+            return Result.error(MessageConstant.UPDATE_EMPLOYEE_FAILURE);
+        }
+    }
 }

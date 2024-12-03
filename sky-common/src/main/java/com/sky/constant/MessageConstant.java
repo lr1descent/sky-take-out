@@ -26,5 +26,5 @@ public class MessageConstant {
     public static final String ORDER_NOT_FOUND = "订单不存在";
     public static final String SAVE_ERROR = "添加员工失败";
     public static final String UPDATE_STATUS_FAILURE = "更新员工账户状态失败";
-
+    public static final String UPDATE_EMPLOYEE_FAILURE = "编辑员工信息失败";
 }

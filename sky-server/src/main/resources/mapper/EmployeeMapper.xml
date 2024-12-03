@@ -24,4 +24,7 @@
             </if>
         </where>
     </select>
+    <select id="selectById" resultType="com.sky.entity.Employee">
+        select * from employee where id = #{id}
+    </select>
 </mapper>
