@@ -1,6 +1,9 @@
 package com.sky.controller.admin;
 
 import com.sky.constant.JwtClaimsConstant;
+import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
+import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.entity.Employee;
 import com.sky.properties.JwtProperties;
@@ -76,4 +79,25 @@ public class EmployeeController {
         return Result.success();
     }
 
+    /**
+     * 添加员工
+     * @param employeeDTO
+     * @return
+     */
+    @PostMapping
+    @ApiOperation("添加员工")
+    public Result<String> employee(@RequestBody EmployeeDTO employeeDTO) {
+        // 记录添加员工的日志信息
+        log.info("新增员工：{}",employeeDTO);
+
+        // 添加员工
+        // 如果添加成功，那么返回success
+        // 如果添加失败，那么返回error
+        int status = employeeService.save(employeeDTO);
+        if (status == StatusConstant.ENABLE) {
+            return Result.success();
+        } else {
+            return Result.error(MessageConstant.SAVE_ERROR);
+        }
+    }
 }
