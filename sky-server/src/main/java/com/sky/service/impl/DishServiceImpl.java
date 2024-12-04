@@ -3,12 +3,17 @@ package com.sky.service.impl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.annotation.AutoFill;
+import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.entity.SetmealDish;
+import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
+import com.sky.mapper.SetmealDishMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
@@ -16,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -28,6 +34,9 @@ public class DishServiceImpl implements DishService {
 
     @Autowired
     private DishFlavorMapper dishFlavorMapper;
+
+    @Autowired
+    private SetmealDishMapper setmealDishMapper;
 
     /**
      * 新增菜品
@@ -82,5 +91,41 @@ public class DishServiceImpl implements DishService {
 
         // 将分页查询结果包装成PageResult返回
         return new PageResult(page.getTotal(), page.getResult());
+    }
+
+    /**
+     * 批量删除菜品
+     * 涉及多张表，所以设置该方法为事务方法
+     * @param ids
+     * @return
+     */
+    @Override
+    @Transactional
+    public int deleteByIds(List<Long> ids) {
+        // 删除的菜品中如果在售，无法删除
+        for (Long id : ids) {
+            // 根据菜品id查找对应的菜品，看是否是售出状态，如果是，那么抛出“无法删除在售菜品”
+            Dish dish = dishMapper.selectById(id);
+
+            if (dish.getStatus() == StatusConstant.ENABLE) {
+                throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
+            }
+        }
+
+        // 如果套餐中有关联的菜品，无法删除
+        List<SetmealDish> setmealDishes = setmealDishMapper.selectByIds(ids);
+
+        if (setmealDishes != null && setmealDishes.size() > 0) {
+            throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ON_SALE);
+        }
+
+        // 批量删除菜品
+        int dishesCount = dishMapper.deleteByIds(ids);
+
+        // 批量删除菜品关联的口味数据
+        int flavorsCount = dishFlavorMapper.deleteByIds(ids);
+
+        // 返回删除数据的总条数
+        return dishesCount + flavorsCount;
     }
 }
