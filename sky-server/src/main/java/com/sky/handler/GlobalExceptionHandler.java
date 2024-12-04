@@ -2,6 +2,7 @@ package com.sky.handler;
 
 import com.sky.constant.MessageConstant;
 import com.sky.exception.BaseException;
+import com.sky.exception.DishesNotNullException;
 import com.sky.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -27,6 +28,11 @@ public class GlobalExceptionHandler {
         return Result.error(ex.getMessage());
     }
 
+    /**
+     * 新增用户异常：用户名重复
+     * @param ex
+     * @return
+     */
     @ExceptionHandler
     public Result exceptionHandler(SQLIntegrityConstraintViolationException ex) {
         // 报错提示：Duplicate entry '2222' for key 'employee.idx_username'
@@ -41,6 +47,18 @@ public class GlobalExceptionHandler {
 
         // 返回包含message的Result
         return Result.error(message);
+    }
+
+    /**
+     * 删除分类异常：分类下面的菜品不为空
+     * @param ex
+     * @return
+     */
+    @ExceptionHandler
+    public Result exceptionHandler(DishesNotNullException ex) {
+        log.error("异常信息：{}", ex.getMessage());
+
+        return Result.error(ex.getMessage());
     }
 
 }

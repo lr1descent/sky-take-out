@@ -29,4 +29,6 @@ public class MessageConstant {
     public static final String UPDATE_EMPLOYEE_FAILURE = "编辑员工信息失败";
     public static final String UPDATE_CATEGORY_FAILURE = "修改分类失败";
     public static final String SAVE_CATEGORY_FAILURE = "新增分类失败";
+    public static final String DELETE_CATEGORY_ERROR = "删除分类失败";
+    public static final String DISHES_NOT_NULL = "分类对应的菜品不为空";
 }

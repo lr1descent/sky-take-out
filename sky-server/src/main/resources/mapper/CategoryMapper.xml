@@ -20,6 +20,14 @@
             id = #{id}
         </where>
     </update>
+    <delete id="deleteById">
+        delete from category
+        <where>
+            <if test="id != null">
+                id = #{id}
+            </if>
+        </where>
+    </delete>
     <select id="pageQuery" resultType="com.sky.entity.Category">
         select * from category
         <where>

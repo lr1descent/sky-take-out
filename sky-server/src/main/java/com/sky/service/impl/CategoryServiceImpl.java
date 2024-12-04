@@ -2,11 +2,13 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.CategoryDTO;
 import com.sky.dto.CategoryPageQueryDTO;
 import com.sky.entity.Category;
+import com.sky.exception.DishesNotNullException;
 import com.sky.mapper.CategoryMapper;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealMapper;
@@ -117,5 +119,21 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<Category> selectByType(Integer type) {
         return categoryMapper.selectByType(type);
+    }
+
+    /**
+     * 根据id删除分类
+     * @param id
+     * @return
+     */
+    @Override
+    public int deleteById(Long id){
+        // 查看dish中category_id = id的数量，如果不为0，说明dish中不含有该id对应的分类的菜品
+        // 可以删除
+        int numberOfDishes = dishMapper.selectCountByCategoryId(id);
+        if (numberOfDishes != 0) {
+            throw new DishesNotNullException(MessageConstant.DISHES_NOT_NULL);
+        }
+        return categoryMapper.deleteById(id);
     }
 }
