@@ -7,7 +7,7 @@ sky:
     username: root
     password: Hk123456..
   alioss:
-    access-key-id: your_access_key_id
-    access-key-secret: your_access_key_secret
+    access-key-id: LTAI5tMVc9uej6rF1nWayQMe
+    access-key-secret: 0sXZ3ESegBCOqYaD938QKwwapKIPH8
     bucket-name: lr1descent-sky
     endpoint: oss-cn-hangzhou.aliyuncs.com
