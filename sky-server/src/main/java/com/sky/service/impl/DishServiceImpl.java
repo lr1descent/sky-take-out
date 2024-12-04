@@ -23,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -127,5 +129,82 @@ public class DishServiceImpl implements DishService {
 
         // 返回删除数据的总条数
         return dishesCount + flavorsCount;
+    }
+
+    /**
+     * 修改菜品
+     * @param dishDTO
+     * @return
+     */
+    @Override
+    @Transactional
+    public int updateDish(DishDTO dishDTO) {
+        // 修改菜品信息
+        // 由于dishDTO中存在口味数据，不妨新建一个Dish对象
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO, dish);
+
+        // 更新菜品
+        int updateDishOk = dishMapper.update(dish);
+
+        // 修改菜品对象的口味数据
+        // 1. 删除该菜品对应的所有口味数据
+        int deleteFlavorsOk = dishFlavorMapper.deleteByDishId(dish.getId());
+
+        // 2. 添加该菜品新增的口味数据
+        // 由于flavors中不含有菜品id，所以应该遍历flavors，给每一个flavor设置菜品id
+        List<DishFlavor> flavors = dishDTO.getFlavors();
+
+        for (DishFlavor flavor : flavors) {
+            flavor.setDishId(dish.getId());
+        }
+        int insertFlavorsOk = dishFlavorMapper.insertBatch(flavors);
+
+        return (updateDishOk & deleteFlavorsOk & insertFlavorsOk);
+    }
+
+    /**
+     * 根据id查询菜品
+     * @param id
+     * @return
+     */
+    @Override
+    public DishVO selectById(Long id) {
+        // 根据id查询菜品
+        Dish dish = dishMapper.selectById(id);
+        DishVO dishVO = new DishVO();
+
+        BeanUtils.copyProperties(dish, dishVO);
+
+        // 根据菜品id查询对应的口味数据
+        List<DishFlavor> dishFlavors = dishFlavorMapper.selectByDishId(id);
+
+        // 包装成DishVO返回
+        dishVO.setFlavors(dishFlavors);
+
+        return dishVO;
+    }
+
+    /**
+     * 根据分类id查询菜品
+     * @param categoryId
+     * @return
+     */
+    @Override
+    public List<Dish> selectByCategoryId(Long categoryId) {
+        return dishMapper.selectByCategoryId(categoryId);
+    }
+
+    /**
+     * 商品起售/停售
+     * @param status
+     * @param id
+     * @return
+     */
+    @Override
+    public int startOrStop(Integer status, Long id) {
+        Dish dish = Dish.builder().id(id).status(status).build();
+        int ok = dishMapper.update(dish);
+        return 0;
     }
 }
