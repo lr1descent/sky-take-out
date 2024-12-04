@@ -2,6 +2,7 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.CategoryDTO;
 import com.sky.dto.CategoryPageQueryDTO;
@@ -11,6 +12,7 @@ import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.CategoryService;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STAlgType;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -80,5 +82,40 @@ public class CategoryServiceImpl implements CategoryService {
                 .build();
 
         return categoryMapper.update(category);
+    }
+
+    /**
+     * 新增分类
+     * @param categoryDTO
+     * @return
+     */
+    @Override
+    public int insertCategory(CategoryDTO categoryDTO) {
+        Category category = new Category();
+        BeanUtils.copyProperties(categoryDTO, category);
+
+        // 设置创建时间和创建者id
+        category.setCreateTime(LocalDateTime.now());
+        category.setCreateUser(BaseContext.getCurrentId());
+
+        // 设置更新时间和更新者id
+        category.setUpdateTime(LocalDateTime.now());
+        category.setUpdateUser(BaseContext.getCurrentId());
+
+        // 设置分类状态，默认为启动
+        category.setStatus(StatusConstant.ENABLE);
+
+        // 新增分类
+        return categoryMapper.insert(category);
+    }
+
+    /**
+     * 根据类型查询分类
+     * @param type
+     * @return
+     */
+    @Override
+    public List<Category> selectByType(Integer type) {
+        return categoryMapper.selectByType(type);
     }
 }

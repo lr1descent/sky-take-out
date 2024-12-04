@@ -77,5 +77,38 @@ public class CategoryController {
         }
     }
 
+    /**
+     * 新增分类
+     * @param categoryDTO
+     * @return
+     */
+    @PostMapping
+    @ApiOperation("新增分类")
+    public Result insertCategory(@RequestBody CategoryDTO categoryDTO) {
+        log.info("新增分类：{}", categoryDTO);
+
+        int ok = categoryService.insertCategory(categoryDTO);
+        if (ok == 1) {
+            return Result.success();
+        } else {
+            return Result.error(MessageConstant.SAVE_CATEGORY_FAILURE);
+        }
+    }
+
+    /**
+     * 根据类型查询分类
+     * @param type
+     * @return
+     */
+    @GetMapping("/list")
+    @ApiOperation("根据类型查询分类")
+    public Result<List<Category>> selectByType(Integer type) {
+        log.info("根据类型查询分类：{}", type);
+
+        List<Category> categories = categoryService.selectByType(type);
+
+        return Result.success(categories);
+    }
+
 
 }

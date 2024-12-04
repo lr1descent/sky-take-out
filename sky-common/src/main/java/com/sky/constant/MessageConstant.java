@@ -28,4 +28,5 @@ public class MessageConstant {
     public static final String UPDATE_STATUS_FAILURE = "更新员工账户状态失败";
     public static final String UPDATE_EMPLOYEE_FAILURE = "编辑员工信息失败";
     public static final String UPDATE_CATEGORY_FAILURE = "修改分类失败";
+    public static final String SAVE_CATEGORY_FAILURE = "新增分类失败";
 }
