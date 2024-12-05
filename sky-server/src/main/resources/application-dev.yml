@@ -11,3 +11,8 @@ sky:
     access-key-secret: 0sXZ3ESegBCOqYaD938QKwwapKIPH8
     bucket-name: lr1descent-sky
     endpoint: oss-cn-hangzhou.aliyuncs.com
+  redis:
+    host: 47.95.215.89
+    port: 6379
+    password: Hk123456..
+    database: 10
