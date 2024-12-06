@@ -60,4 +60,8 @@
     <select id="selectByCategoryId" resultType="com.sky.entity.Dish">
         select * from dish where category_id = #{categoryId}
     </select>
+
+    <select id="selectByCategoryIdWithFlavors" resultType="com.sky.entity.Dish">
+        select * from dish where category_id = #{categoryId}
+    </select>
 </mapper>

@@ -64,4 +64,7 @@ public interface DishMapper {
      * @return
      */
     List<Dish> selectByCategoryId(Long categoryId);
+
+
+    List<Dish> selectByCategoryIdWithFlavors(Long categoryId);
 }

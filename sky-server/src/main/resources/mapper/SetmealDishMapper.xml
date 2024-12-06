@@ -8,4 +8,9 @@
             #{id}
         </foreach>
     </select>
+    <select id="selectBySetmealId" resultType="com.sky.vo.DishItemVO">
+        select dish.name, copies, description, image
+            from (select * from setmeal_dish where setmeal_id = #{setmealId}) t1 left join dish
+            on dish.id = t1.dish_id
+    </select>
 </mapper>

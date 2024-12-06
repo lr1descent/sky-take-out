@@ -1,8 +1,8 @@
 package com.sky.service.impl;
 
+import com.fasterxml.jackson.databind.util.BeanUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.sky.annotation.AutoFill;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
@@ -20,10 +20,10 @@ import com.sky.vo.DishVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -206,5 +206,22 @@ public class DishServiceImpl implements DishService {
         Dish dish = Dish.builder().id(id).status(status).build();
         int ok = dishMapper.update(dish);
         return 0;
+    }
+
+    @Override
+    public List<DishVO> selectByCategoryIdWithFlavors(Long categoryId) {
+        List<Dish> dishes = selectByCategoryId(categoryId);
+        List<DishVO> dishVOS = new ArrayList<>();
+
+        for (Dish dish : dishes) {
+            List<DishFlavor> flavors = dishFlavorMapper.selectByDishId(dish.getId());
+            DishVO dishVO = new DishVO();
+            BeanUtils.copyProperties(dish, dishVO);
+            dishVO.setFlavors(flavors);
+
+            dishVOS.add(dishVO);
+        }
+
+        return dishVOS;
     }
 }
