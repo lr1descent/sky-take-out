@@ -13,11 +13,14 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
-@RestController
+@RestController("adminDishController")
 @RequestMapping("/admin/dish")
 @Slf4j
 @Api(tags = "菜品相关接口")
@@ -26,6 +29,9 @@ public class DishController {
     @Autowired
     private DishService dishService;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     /**
      * 新增菜品
      * @param dishDTO
@@ -33,6 +39,7 @@ public class DishController {
      */
     @PostMapping
     @ApiOperation("新增菜品")
+    @CacheEvict(cacheNames = "dish", key = "#dishDTO.categoryId")
     public Result addDish(@RequestBody DishDTO dishDTO) {
         log.info("新增菜品：{}", dishDTO);
 
@@ -61,11 +68,11 @@ public class DishController {
      */
     @DeleteMapping
     @ApiOperation("批量删除菜品")
+    @CacheEvict(cacheNames = "dish", allEntries = true)
     public Result deleteByIds(@RequestParam List<Long> ids) {
         log.info("批量删除菜品：{}", ids);
 
         int count = dishService.deleteByIds(ids);
-
         return Result.success();
     }
 
@@ -86,6 +93,7 @@ public class DishController {
      */
     @PutMapping
     @ApiOperation("修改菜品")
+    @CacheEvict(cacheNames = "dish", allEntries = true)
     public Result updateDish(@RequestBody DishDTO dishDTO) {
         log.info("修改菜品：{}", dishDTO);
 
@@ -93,6 +101,11 @@ public class DishController {
         return Result.success();
     }
 
+    /**
+     * 根据分类id查询菜品
+     * @param categoryId
+     * @return
+     */
     @GetMapping("/list")
     @ApiOperation("根据分类id查询菜品")
     public Result<List<Dish>> selectByCategoryId(Long categoryId) {
@@ -103,8 +116,15 @@ public class DishController {
         return Result.success(dishes);
     }
 
+    /**
+     * 菜品起售/停售
+     * @param status
+     * @param id
+     * @return
+     */
     @PostMapping("/status/{status}")
     @ApiOperation("菜品起售/停售")
+    @CacheEvict(cacheNames = "dish", allEntries = true)
     public Result startOrStop(@PathVariable Integer status, Long id) {
         log.info("菜品起售/停售：status = {}, id = {}", status, id);
 
