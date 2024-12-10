@@ -17,6 +17,7 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,10 +41,10 @@ public class OrderServiceImpl implements OrderService {
     private OrderDetailMapper orderDetailMapper;
 
     @Autowired
-    private WeChatPayUtil weChatPayUtil;
+    private UserMapper userMapper;
 
     @Autowired
-    private UserMapper userMapper;
+    private WebSocketServer webSocketServer;
 
     /**
      * 用户下单
@@ -153,6 +154,14 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(Orders.TO_BE_CONFIRMED);
         order.setPayStatus(Orders.PAID);
         order.setCheckoutTime(LocalDateTime.now());
+
+        // 支付成功，向管理端发送来单提醒
+        Map map = new HashMap();
+        map.put("type", 1);
+        map.put("orderId", order.getId());
+        map.put("content", "你有新的订单");
+
+        webSocketServer.sendToAllClient(JSONObject.toJSONString(map));
 
         orderMapper.update(order);
     }
@@ -324,5 +333,20 @@ public class OrderServiceImpl implements OrderService {
         orderStatisticsVO.setToBeConfirmed(orderMapper.selectByStatus(Orders.TO_BE_CONFIRMED));
 
         return orderStatisticsVO;
+    }
+
+    /**
+     * 催单
+     * @param id
+     */
+    @Override
+    public void remind(Long id) {
+        // 给管理端发送催单提醒
+        Map map = new HashMap<>();
+        map.put("type", 2);
+        map.put("orderId", id);
+        map.put("content", "催单提醒");
+
+        webSocketServer.sendToAllClient(JSONObject.toJSONString(map));
     }
 }

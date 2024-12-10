@@ -90,4 +90,9 @@ public interface OrderService {
      */
     OrderStatisticsVO statistics();
 
+    /**
+     * 催单
+     * @param id
+     */
+    void remind(Long id);
 }
