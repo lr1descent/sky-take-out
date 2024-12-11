@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.ReportMapper;
@@ -7,9 +8,11 @@ import com.sky.mapper.UserMapper;
 import com.sky.result.PageResult;
 import com.sky.service.ReportService;
 import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import io.swagger.models.auth.In;
+import net.bytebuddy.asm.Advice;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -181,5 +184,32 @@ public class ReportServiceImpl implements ReportService {
                 .validOrderCount(invalidOrders)
                 .build();
         return orderReportVO;
+    }
+
+    /**
+     * 查询销量排名top10
+     * @param begin
+     * @param end
+     * @return
+     */
+    @Override
+    public SalesTop10ReportVO top10(LocalDate begin, LocalDate end) {
+        LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN);
+        LocalDateTime endTime = LocalDateTime.of(begin, LocalTime.MAX);
+
+        List<GoodsSalesDTO> goodsSalesDTOS = reportMapper.selectSalesTop10(beginTime, endTime);
+
+        List<String> nameList = new ArrayList<>();
+        List<Integer> numberList = new ArrayList<>();
+
+        for (GoodsSalesDTO goodsSalesDTO : goodsSalesDTOS) {
+            nameList.add(goodsSalesDTO.getName());
+            numberList.add(goodsSalesDTO.getNumber());
+        }
+
+        return SalesTop10ReportVO.builder()
+                .nameList(StringUtils.join(nameList, ","))
+                .numberList(StringUtils.join(numberList, ","))
+                .build();
     }
 }

@@ -1,9 +1,12 @@
 package com.sky.mapper;
 
+import com.sky.dto.GoodsSalesDTO;
+import com.sky.vo.SalesTop10ReportVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Mapper
@@ -22,4 +25,12 @@ public interface ReportMapper {
      * @return
      */
     Integer selectByMap(Map map);
+
+    /**
+     * 销量统计top10
+     * @param beginTime
+     * @param endTime
+     * @return
+     */
+    List<GoodsSalesDTO> selectSalesTop10(LocalDateTime beginTime, LocalDateTime endTime);
 }
