@@ -1,10 +1,12 @@
 package com.sky.service.impl;
 
 import com.sky.entity.Orders;
+import com.sky.mapper.OrderMapper;
 import com.sky.mapper.ReportMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.result.PageResult;
 import com.sky.service.ReportService;
+import com.sky.vo.OrderReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import io.swagger.models.auth.In;
@@ -117,5 +119,67 @@ public class ReportServiceImpl implements ReportService {
                 .newUserList(StringUtils.join(newUserList, ","))
                 .totalUserList(StringUtils.join(totalUserList, ","))
                 .build();
+    }
+
+    /**
+     * 订单统计
+     * @return
+     */
+    @Override
+    public OrderReportVO orderStatistics(LocalDate begin, LocalDate end) {
+        // 统计begin至end期间每天的订单数量，有效订单数量
+
+        // localDateList存储begin至end期间每天的日期
+        List<LocalDate> localDateList = new ArrayList<>();
+
+        while (!begin.equals(end)) {
+            localDateList.add(begin);
+            begin = begin.plusDays(1);
+            localDateList.add(begin);
+        }
+
+        // orderTotalList存储每天的总订单量
+        // orderInvalidList存储每天的有效订单量
+        List<Integer> orderTotalList = new ArrayList<>();
+        List<Integer> orderInvalidList = new ArrayList<>();
+
+        Integer totalOrders = 0;
+        Integer invalidOrders = 0;
+
+        for (LocalDate localDate : localDateList) {
+            LocalDateTime beginTime = LocalDateTime.of(localDate, LocalTime.MIN);
+            LocalDateTime endTime = LocalDateTime.of(localDate, LocalTime.MAX);
+
+            Map map = new HashMap();
+            map.put("begin", beginTime);
+            map.put("end", endTime);
+
+            // 查询一天的总订单数
+            Integer ordersCount = reportMapper.selectByMap(map);
+
+            map.put("status", Orders.COMPLETED);
+
+            // 查询一天的有效订单数
+            Integer invalidCount = reportMapper.selectByMap(map);
+
+            orderTotalList.add(ordersCount);
+            orderInvalidList.add(invalidCount);
+
+            totalOrders += ordersCount;
+            invalidOrders += invalidCount;
+        }
+
+        Double completedRate = 0.0;
+        if (totalOrders != null) completedRate = invalidOrders.doubleValue() / totalOrders;
+
+        OrderReportVO orderReportVO = OrderReportVO.builder()
+                .dateList(StringUtils.join(localDateList, ","))
+                .validOrderCountList(StringUtils.join(orderInvalidList, ","))
+                .orderCountList(StringUtils.join(orderTotalList, ","))
+                .orderCompletionRate(completedRate)
+                .totalOrderCount(totalOrders)
+                .validOrderCount(invalidOrders)
+                .build();
+        return orderReportVO;
     }
 }

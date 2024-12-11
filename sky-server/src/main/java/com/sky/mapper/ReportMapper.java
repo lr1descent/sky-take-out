@@ -15,4 +15,11 @@ public interface ReportMapper {
     @Select("select sum(amount) from orders " +
             "where order_time > #{beginTime} and order_time < #{endTime} and status = #{status}")
     Double selectByTime(Map map);
+
+    /**
+     * 根据map查询订单
+     * @param map
+     * @return
+     */
+    Integer selectByMap(Map map);
 }
