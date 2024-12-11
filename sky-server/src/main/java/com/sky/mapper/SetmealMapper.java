@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface SetmealMapper {
@@ -63,4 +64,12 @@ public interface SetmealMapper {
      * @return
      */
     List<Setmeal> list(Setmeal setmeal);
+
+    /**
+     * 根据map查询套餐数量
+     * @param map
+     * @return
+     */
+    @Select("select count(*) from setmeal where status = #{status}")
+    Integer selectByMap(Map map);
 }

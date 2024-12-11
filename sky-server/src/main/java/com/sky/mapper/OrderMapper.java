@@ -55,7 +55,6 @@ public interface OrderMapper {
      * @param status
      * @return
      */
-    @Select("select count(*) from orders where status = #{status}")
     Integer selectByStatus(Integer status);
 
     /**
@@ -66,4 +65,18 @@ public interface OrderMapper {
      */
     @Select("select * from orders where status = #{pendingPayment} and order_time < #{time}")
     List<Orders> selectByStatusAndOrderTime(Integer pendingPayment, LocalDateTime time);
+
+    /**
+     * 根据map查询订单数量
+     * @param map
+     * @return
+     */
+    Integer selectByMap(Map map);
+
+    /**
+     * 查询某个区间之间的营业额总和
+     * @param map
+     * @return
+     */
+    Double turnOver(Map map);
 }
